@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Ticket Seller - Event Details</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Raleway:300,400,500,700,800" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link th:href="@{/assets/vendor/aos/aos.css}" rel="stylesheet">
+    <!--<link href="../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">-->
+    <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/glightbox/css/glightbox.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/swiper/swiper-bundle.min.css}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link th:href="@{/assets/css/style.css}" rel="stylesheet">
+
+</head>
+
+<body>
+
+<!-- ======= Header ======= -->
+<header id="header" class="d-flex align-items-center header-inner">
+    <div class="container-fluid container-xxl d-flex align-items-center">
+
+        <div id="logo" class="me-auto">
+            <h1><a th:href="@{/}">Ticket<span>Seller</span></a></h1>
+        </div>
+
+        <nav id="navbar" class="navbar order-last order-lg-0">
+            <div sec:authorize="!isAuthenticated()">
+                <a class="about-btn" th:href="@{/login}">Login</a>
+            </div>
+            <div sec:authorize="isAuthenticated()">
+                <ul>
+                    <li><a class="nav-link scrollto active" th:href="@{/}">Home</a></li>
+                    <li class="dropdown"><a href="#"><span sec:authentication="principal.firstName"></span> <i class="bi bi-chevron-down"></i></a>
+                        <ul>
+                            <li sec:authorize="hasRole('USER')"><a th:href="@{/my-tickets}">My Tickets</a></li>
+                            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/administrate}">Administrate</a></li>
+                            <li>
+                                <form th:action="@{/logout}" method="POST" th:hidden="true" name="logoutForm">
+                                    <input type="submit" value="Logout">
+                                </form>
+                                <a href="javascript:document.logoutForm.submit()">Logout</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+        </nav><!-- .navbar -->
+        <a class="buy-tickets scrollto" th:href="@{/#buy-tickets}">Buy Tickets</a>
+    </div>
+</header><!-- End Header -->
+
+
+<main id="main" class="main-page">
+
+    <!-- ======= Schedule Section ======= -->
+    <section id="schedule" class="section-with-bg">
+        <div class="container" data-aos="fade-up">
+            <div class="section-header">
+                <h2>My Tickets</h2>
+                <p>Here are the tickets you have purchased</p>
+            </div>
+
+            <div class="tab-content row justify-content-center" data-aos="fade-up" data-aos-delay="200">
+
+                <div role="tabpanel" class="col-lg-9 tab-pane fade show active" id="day-1">
+
+                    <div th:if="${#lists.isEmpty(tickets)}" class="row schedule-item">
+                        <div class="col-6 text-center align-items-center">
+                            <p> Oops, it seems you don't have any tickets! </p>
+                        </div>
+                    </div>
+
+                    <div th:if="${not #lists.isEmpty(tickets)}" th:each="ticket : ${tickets}" class="row schedule-item">
+                        <div class="col-2 text-center align-items-center">
+                            <p th:text="${#strings.substring(ticket.event.startTime,0,5)}"></p>
+                            <p th:text="${#dates.format(ticket.event.date, 'dd-MM-yy')}"></p>
+                        </div>
+                        <div class="col-8">
+                            <div class="speaker">
+                                <img th:src="@{/images/{id}.jpg(id=${ticket.event.id})}" alt="Event img">
+                            </div>
+                            <h3 class="mb-1"><span th:text="${ticket.event.title}"></span></h3>
+                            <p><span th:text="${ticket.event.venue.name}"></span></p>
+                        </div>
+                        <div class="col-2">
+                            <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-primary">Show Ticket</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section><!-- End Schedule Section -->
+
+
+</main><!-- End #main -->
+
+<!-- ======= Footer ======= -->
+<footer id="footer">
+    <div class="container">
+        <div class="copyright">
+            &copy; Copyright <strong>TheEvent</strong>. All Rights Reserved
+        </div>
+        <div class="credits">
+            <!--
+            All the links in the footer should remain intact.
+            You can delete the links only if you purchased the pro version.
+            Licensing information: https://bootstrapmade.com/license/
+            Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=TheEvent
+          -->
+            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        </div>
+    </div>
+</footer><!-- End  Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script th:src="@{/assets/vendor/aos/aos.js}"></script>
+<script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/glightbox/js/glightbox.min.js}"></script>
+<script th:src="@{/assets/vendor/swiper/swiper-bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/php-email-form/validate.js}"></script>
+
+<!-- Template Main JS File -->
+<script th:src="@{/assets/js/main.js}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Seller - Add Event</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Raleway:300,400,500,700,800" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link th:href="@{/assets/vendor/aos/aos.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/glightbox/css/glightbox.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/swiper/swiper-bundle.min.css}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link th:href="@{/assets/css/style.css}" rel="stylesheet">
+
+    <!-- Popperjs -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.2/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <!-- Tempus Dominus JavaScript -->
+    <script src="https://cdn.jsdelivr.net/gh/Eonasdan/tempus-dominus@master/dist/js/tempus-dominus.js" crossorigin="anonymous"></script>
+    <!-- Tempus Dominus Styles -->
+    <link href="https://cdn.jsdelivr.net/gh/Eonasdan/tempus-dominus@master/dist/css/tempus-dominus.css" rel="stylesheet" crossorigin="anonymous">
+
+</head>
+<body>
+<!-- ======= Header ======= -->
+<header id="header" class="d-flex align-items-center header-inner">
+    <div class="container-fluid container-xxl d-flex align-items-center">
+
+        <div id="logo" class="me-auto">
+            <h1><a th:href="@{/}">Ticket<span>Seller</span></a></h1>
+        </div>
+
+        <nav id="navbar" class="navbar order-last order-lg-0">
+            <div sec:authorize="!isAuthenticated()">
+                <a class="about-btn" th:href="@{/login}">Login</a>
+            </div>
+            <div sec:authorize="isAuthenticated()">
+                <ul>
+                    <li><a class="nav-link scrollto active" th:href="@{/}">Home</a></li>
+                    <li class="dropdown"><a href="#"><span sec:authentication="principal.firstName"></span> <i class="bi bi-chevron-down"></i></a>
+                        <ul>
+                            <li sec:authorize="hasRole('USER')"><a th:href="@{/my-tickets}">My Tickets</a></li>
+                            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/administrate}">Administrate</a></li>
+                            <li>
+                                <form th:action="@{/logout}" method="POST" th:hidden="true" name="logoutForm">
+                                    <input type="submit" value="Logout">
+                                </form>
+                                <a href="javascript:document.logoutForm.submit()">Logout</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+        </nav><!-- .navbar -->
+        <a class="buy-tickets scrollto" th:href="@{/#buy-tickets}">Buy Tickets</a>
+    </div>
+</header><!-- End Header -->
+
+<main id="main" class="main-page">
+    <section id="speakers-details">
+        <div class="container">
+            <div class="section-header">
+                <h2>Add event</h2>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 container justify-content-center card">
+                    <div class="card-body">
+                        <form th:action="@{/events/{id} (id=${event.id}) }" th:object = "${event}" method="POST" enctype="multipart/form-data">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Name</label>
+                                <input
+                                        type="text"
+                                        name="title"
+                                        th:field="*{title}"
+                                        class = "form-control"
+                                        placeholder="Enter event title...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Cover Image</label>
+                                <input class="form-control" name="coverPath" type="file" accept=".jpg">
+                                <!--<input class="form-control" name="coverPath" th:field="*{coverPath}" type="file" accept=".jpg">-->
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Venue</label>
+                                <select required class="form-select p-2" name="venue" th:field="*{venue}">
+                                    <option value="">-- Choose a venue --</option>
+                                    <option
+                                            th:each="venue : ${venues}"
+                                            th:value="${venue.id}"
+                                            th:text="${venue.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                <select required th:field="*{category}"  class="form-select" name="category">
+                                    <option value="">-- Choose a category --</option>
+                                    <th:block th:each="category : ${categories}">
+                                        <option th:text="${category.name}" th:value="${category.id}" />
+                                    </th:block>
+
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Date</label>
+                                <input
+                                        type="date"
+                                        name="date"
+                                        th:field="*{date}"
+                                        th:value="${{event.date}}"
+                                        th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                                        class = "form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Start Time</label>
+                                <input
+                                        required
+                                        type="time"
+                                        name="startTime"
+                                        th:field="*{startTime}"
+                                        class = "form-control">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea
+                                        name="description"
+                                        th:field="*{description}"
+                                        class = "form-control"
+                                        placeholder="Enter event description..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ticket Price</label>
+                                <input
+                                        required
+                                        type="number"
+                                        name="ticketPrice"
+                                        th:field="*{ticketPrice}"
+                                        pattern="^\d*(\.\d{0,3})?$"
+                                        min="0"
+                                        step=".10"
+                                        class = "form-control">
+                            </div>
+
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <a th:href="@{/events}" class="btn btn-danger">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div> <!-- End of form -->
+        </div>
+    </section>
+</main>
+
+
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script th:src="@{/assets/vendor/aos/aos.js}"></script>
+<script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/glightbox/js/glightbox.min.js}"></script>
+<script th:src="@{/assets/vendor/swiper/swiper-bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/php-email-form/validate.js}"></script>
+
+<!-- Template Main JS File -->
+<script th:src="@{/assets/js/main.js}"></script>
+</body>
+</html>

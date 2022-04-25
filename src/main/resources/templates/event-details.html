@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymleaf-extras-springsecurity5">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Ticket Seller - Event Details</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Raleway:300,400,500,700,800" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link th:href="@{/assets/vendor/aos/aos.css}" rel="stylesheet">
+  <!--<link href="../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">-->
+  <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/glightbox/css/glightbox.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/swiper/swiper-bundle.min.css}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link th:href="@{/assets/css/style.css}" rel="stylesheet">
+
+</head>
+
+<body>
+
+<!-- ======= Header ======= -->
+<header id="header" class="d-flex align-items-center header-inner">
+  <div class="container-fluid container-xxl d-flex align-items-center">
+
+    <div id="logo" class="me-auto">
+      <h1><a th:href="@{/}">Ticket<span>Seller</span></a></h1>
+    </div>
+
+    <nav id="navbar" class="navbar order-last order-lg-0">
+      <div sec:authorize="!isAuthenticated()">
+        <a class="about-btn" th:href="@{/login}">Login</a>
+      </div>
+      <div sec:authorize="isAuthenticated()">
+        <ul>
+          <li><a class="nav-link scrollto active" th:href="@{/}">Home</a></li>
+          <li class="dropdown"><a href="#"><span sec:authentication="principal.firstName"></span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+              <li sec:authorize="hasRole('USER')"><a th:href="@{/my-tickets}">My Tickets</a></li>
+              <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/administrate}">Administrate</a></li>
+              <li>
+                <form th:action="@{/logout}" method="POST" th:hidden="true" name="logoutForm">
+                  <input type="submit" value="Logout">
+                </form>
+                <a href="javascript:document.logoutForm.submit()">Logout</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+    </nav><!-- .navbar -->
+    <a class="buy-tickets scrollto" th:href="@{/#buy-tickets}">Buy Tickets</a>
+  </div>
+</header><!-- End Header -->
+
+
+  <main id="main" class="main-page">
+
+    <!-- ======= Event Details Section ======= -->
+    <section id="speakers-details">
+      <div class="container">
+        <div class="section-header">
+          <h2>Event Details</h2>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 text-center">
+            <img th:src="@{/images/{id}.jpg(id=${event.id})}" alt="Speaker 1" class="img-fluid ">
+          </div>
+
+          <div class="col-md-6">
+            <div class="details">
+              <h2 th:text = "${event.title}"></h2>
+              <p th:text = "${event.description}"></p>
+              <h4> Date: <span th:text = "${#dates.format(event.date, 'dd-MMM-yyyy')}"></span>.</h4>
+              <h4> Start time: <span th:text = "${#strings.substring(event.startTime,0,5)}"></span>.</h4>
+              <h4> Location: <span th:text = "${event.venue.name}"></span>. <span th:text = "${event.venue.location}"></span>.</h4>
+              <h4> Capacity: <span th:text = "${event.venue.capacity}"></span>.</h4>
+              <h4> Available Tickets: <span th:text ="${event.venue.capacity - #lists.size(event.tickets)}">0</span>.</h4>
+              <h4> Ticket price: <span th:text = "${event.ticketPrice}"></span>$</h4>
+
+              <h3 style="margin-top:30px; margin-bottom: 15px">Note:</h3>
+              <ul>
+                <li>The event will comply with all relevant biosecurity measures.</li>
+                <li>Minimum age of entry: 8 years old.</li>
+              </ul>
+              <div sec:authorize="!isAuthenticated()" class="text-center">
+                <p>You must <a th:href="@{/login}">login</a> to buy a ticket for this event</p>
+              </div>
+
+              <div sec:authorize="isAuthenticated()" class="text-center">
+                <button sec:authorize="hasRole('USER')" class="buy-tickets scrollto" data-bs-toggle="modal" data-bs-target="#confirmationModal">Buy Ticket</button>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/events/edit/{id}(id=${event.id})}" class="buy-tickets scrollto">Edit Event</a>
+                <!--<a class="buy-tickets scrollto" href="#buy-tickets">Buy Ticket</a>-->
+              </div>
+
+
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Modal -->
+    <div sec:authorize="hasRole('USER')" class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Purchase confirmation</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Are you sure you want to purchase a ticket to this event?</p>
+          </div>
+          <div class="modal-footer">
+            <a type="button" class="btn btn-danger" data-bs-dismiss="modal">No</a>
+            <form th:action="@{/tickets/{id}/process_ticket_purchase(id=${event.id})}" method="post">
+              <input type="submit" class="btn btn-primary" value="Yes">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- End #main -->
+
+<!-- ======= Footer ======= -->
+<footer id="footer">
+  <div class="container">
+    <div class="copyright">
+      &copy; Copyright <strong>TheEvent</strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+      <!--
+      All the links in the footer should remain intact.
+      You can delete the links only if you purchased the pro version.
+      Licensing information: https://bootstrapmade.com/license/
+      Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=TheEvent
+    -->
+      Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+    </div>
+  </div>
+</footer><!-- End  Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script th:src="@{/assets/vendor/aos/aos.js}"></script>
+  <script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/assets/vendor/glightbox/js/glightbox.min.js}"></script>
+  <script th:src="@{/assets/vendor/swiper/swiper-bundle.min.js}"></script>
+  <script th:src="@{/assets/vendor/php-email-form/validate.js}"></script>
+
+  <!-- Template Main JS File -->
+  <script th:src="@{/assets/js/main.js}"></script>
+
+</body>
+
+</html>

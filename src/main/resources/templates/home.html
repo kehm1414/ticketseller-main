@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymleaf-extras-springsecurity5">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Ticket Seller</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Raleway:300,400,500,700,800" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="d-flex align-items-center ">
+    <div class="container-fluid container-xxl d-flex align-items-center">
+
+      <div id="logo" class="me-auto">
+        <h1><a th:href="@{/}">Ticket<span>Seller</span></a></h1>
+      </div>
+
+      <nav id="navbar" class="navbar order-last order-lg-0">
+
+        <ul>
+          <li><a class="nav-link scrollto active" th:href="@{/}">Home</a></li>
+          <li><a class="nav-link scrollto" th:href="@{/#venue}">About</a></li>
+          <li><a class="nav-link scrollto" th:href="@{/#contact}">Contact</a></li>
+
+
+
+          <li sec:authorize="!isAuthenticated()"><a class="nav-link scrollto" style="color:#FF9F1C;" th:href="@{/login}">Login</a></li>
+
+
+        </ul>
+        <div sec:authorize="isAuthenticated()">
+          <ul>
+
+            <li class="dropdown"><a href="#"><span sec:authentication="principal.firstName"></span> <i class="bi bi-chevron-down"></i></a>
+              <ul>
+                <li sec:authorize="hasRole('USER')"><a th:href="@{/my-tickets}">My Tickets</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/administrate}">Administrate</a></li>
+                <li>
+                  <form th:action="@{/logout}" method="POST" th:hidden="true" name="logoutForm">
+                    <input type="submit" value="Logout">
+                  </form>
+                  <a href="javascript:document.logoutForm.submit()">Logout</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+      </nav><!-- .navbar -->
+      <a class="buy-tickets scrollto" th:href="@{/#buy-tickets}">Buy Tickets</a>
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Hero Section ======= -->
+  <section id="hero">
+    <div class="hero-container" data-aos="zoom-in" data-aos-delay="100">
+      <h1 class="mb-4 pb-0">The best place to<br><span>buy tickets</span></h1>
+      <p class="mb-4 pb-0">for your favourite events</p>
+    </div>
+  </section><!-- End Hero Section -->
+
+  <main id="main">
+
+    <!-- ======= Events Section ======= -->
+    <section id="buy-tickets">
+      <div class="container" data-aos="fade-up">
+        <div class="section-header mb-2">
+          <h2>Events</h2>
+          <p>Here are the events that are available right now</p>
+        </div>
+
+
+        <div class="mb-5 row text-center justify-content-center">
+          <form class="row justify-content-center" th:action="@{/#buy-tickets}">
+            <div class="col-10 row justify-content-center">
+              <label class="col-2 col-form-label">Search: </label>
+              <div class="col-5">
+                <input class = "form-control" type="text" name="keyword" th:value="${keyword}" placeholder="Search by title/category/venue..."/>
+              </div>
+              <div class="col-3">
+                <input class="btn btn-primary" type="submit" value="Search"/>
+                <input class="btn btn-danger" type="button" value="Clear" onclick="clearFilter()"/>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="row">
+          <div th:each="event : ${events}" class="col-lg-4 col-md-4">
+
+              <div class="speaker" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-center">
+                <img th:src="@{/images/{id}.jpg(id=${event.id})}" style="max-width:100%; max-height:100%" alt="Speaker 1" class="img-fluid">
+                </div>
+                <div class="details" style="width:300px; margin:auto">
+                  <h3 style="margin-bottom:15px" > <a th:href="@{/event-details/{id}(id=${event.id})}" th:text = "${event.title}"> </a></h3>
+                  <p style="margin-bottom:5px" th:text = "${event.venue.name}"></p>
+                  <p th:text = "${event.category.name}"></p>
+                  <p th:text = "${#dates.format(event.date, 'dd-MMM-yyyy')}"></p>
+                </div>
+              </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section><!-- End Events Section -->
+
+
+    <!-- ======= About Section ======= -->
+    <section id="venue" class="section-with-bg">
+
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-header">
+          <h2>About Us</h2>
+          <p>Know a bit more about us.</p>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6 text-center">
+            <h2>Mission</h2>
+            <p>Ticketseller is a multidisciplinary platform for acquiring tickets for your favourite events without
+            distinction on which category it belongs to and everything made easy, so you don't have to worry about
+            anything else, we do it all for you.</p>
+          </div>
+          <div class="col-lg-6 text-center">
+            <h2>Vision</h2>
+            <p>Be, and be recognized as, the best platform for people to find events occurring worldwide in the most
+            accessible way</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      </div>
+    </section><!-- End About Section -->
+
+
+    <!-- ======= Contact Section ======= -->
+    <section id="contact">
+
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-header">
+          <h2>Contact Us</h2>
+          <p>We're ready to give you the best attention.</p>
+        </div>
+
+        <div class="row contact-info">
+
+          <div class="col-md-4">
+            <div class="contact-address">
+              <i class="bi bi-geo-alt"></i>
+              <h3>Address</h3>
+              <address>A108 Adam Street, NY 535022, USA</address>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="contact-phone">
+              <i class="bi bi-phone"></i>
+              <h3>Phone Number</h3>
+              <p><a href="tel:+155895548855">+1 5589 55488 55</a></p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="contact-email">
+              <i class="bi bi-envelope"></i>
+              <h3>Email</h3>
+              <p><a href="mailto:info@ticketseller.com">info@ticketseller.com</a></p>
+            </div>
+          </div>
+
+        </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Contact Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong>TheEvent</strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!--
+        All the links in the footer should remain intact.
+        You can delete the links only if you purchased the pro version.
+        Licensing information: https://bootstrapmade.com/license/
+        Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=TheEvent
+      -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+  </footer><!-- End  Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script th:src="@{assets/vendor/aos/aos.js}"></script>
+  <script th:src="@{assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{assets/vendor/glightbox/js/glightbox.min.js}"></script>
+  <script th:src="@{assets/vendor/swiper/swiper-bundle.min.js}"></script>
+  <script th:src="@{assets/vendor/php-email-form/validate.js}"></script>
+
+  <!-- Template Main JS File -->
+  <script th:src="@{assets/js/main.js}"></script>
+
+  <script type="text/javascript">
+    function clearFilter(){
+      window.location = '/#buy-tickets';
+    }
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Seller - Event Categories List</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Raleway:300,400,500,700,800" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link th:href="@{/assets/vendor/aos/aos.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/glightbox/css/glightbox.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/swiper/swiper-bundle.min.css}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link th:href="@{/assets/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<!-- ======= Header ======= -->
+<header id="header" class="d-flex align-items-center header-inner">
+    <div class="container-fluid container-xxl d-flex align-items-center">
+
+        <div id="logo" class="me-auto">
+            <h1><a th:href="@{/}">Ticket<span>Seller</span></a></h1>
+        </div>
+
+        <nav id="navbar" class="navbar order-last order-lg-0">
+            <div sec:authorize="!isAuthenticated()">
+                <a class="about-btn" th:href="@{/login}">Login</a>
+            </div>
+            <div sec:authorize="isAuthenticated()">
+                <ul>
+                    <li><a class="nav-link scrollto active" th:href="@{/}">Home</a></li>
+                    <li class="dropdown"><a href="#"><span sec:authentication="principal.firstName"></span> <i class="bi bi-chevron-down"></i></a>
+                        <ul>
+                            <li sec:authorize="hasRole('USER')"><a th:href="@{/my-tickets}">My Tickets</a></li>
+                            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/administrate}">Administrate</a></li>
+                            <li>
+                                <form th:action="@{/logout}" method="POST" th:hidden="true" name="logoutForm">
+                                    <input type="submit" value="Logout">
+                                </form>
+                                <a href="javascript:document.logoutForm.submit()">Logout</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+        </nav><!-- .navbar -->
+        <a class="buy-tickets scrollto" th:href="@{/#buy-tickets}">Buy Tickets</a>
+    </div>
+</header><!-- End Header -->
+
+<main id="main" class="main-page">
+    <section id="speakers-details">
+        <div class="container">
+            <div class="section-header">
+                <h2>Event Categories</h2>
+            </div>
+
+            <!-- Add Category button-->
+            <div class="row">
+                <div class="text-center">
+                    <a th:href="@{/event-categories/new}" class="btn btn-primary btn-sm mb-3">
+                        <i class="bi bi-plus-circle"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="row justify-content-center">
+                <div class="col-6 align-self-center">
+                    <table class="table table-striped table-hover table-bordered col-6">
+                        <thead class="table-dark text-center">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="category : ${categories}">
+                            <th class="text-center" th:text = "${category.id}" scope="row"></th>
+                            <td th:text = "${category.name}"></td>
+                            <td class="text-center">
+                                <!-- Edit category button-->
+                                <a th:href="@{/event-categories/edit/{id}(id=${category.id})}"
+                                   class = "btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                <!-- Delete category button-->
+                                <a th:href="@{/event-categories/{id}(id=${category.id})}"
+                                   class = "btn btn-sm btn-danger"><i class="bi bi-x"></i></i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            </div>
+        </div>
+    </section>
+</main>
+
+
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script th:src="@{/assets/vendor/aos/aos.js}"></script>
+<script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/glightbox/js/glightbox.min.js}"></script>
+<script th:src="@{/assets/vendor/swiper/swiper-bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/php-email-form/validate.js}"></script>
+
+<!-- Template Main JS File -->
+<script th:src="@{/assets/js/main.js}"></script>
+</body>
+</html>
